@@ -8,6 +8,12 @@
 #include "../src/emergency_module.h"
 #include "mini_assert.h"
 
+// Skip heavy multithread/stress when CI sets DISABLE_MT (e.g., in TSAN job)
+static int tsan_mt_disabled(void) {
+    const char* e = getenv("DISABLE_MT");
+    return (e && *e && strcmp(e, "0") != 0); // any non-empty value disables MT
+}
+
 // check global emergency state by querying a fresh node.
 static int get_global_state(void) {
     EmergencyNode_t tmp;
