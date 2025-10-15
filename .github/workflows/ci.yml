@@ -1,0 +1,45 @@
+name: CI: C Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: gcc/clang (no sanitizer)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+        stress: [0, 250]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y build-essential clang
+      - name: Build
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          make clean || true
+          make
+      - name: Run tests
+        env:
+          STRESS_LOOPS: ${{ matrix.stress }}
+        run: make run
+
+  tsan:
+    name: clang + ThreadSanitizer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+      - name: Build (TSAN)
+        run: |
+          make clean || true
+          make SAN=tsan
+      - name: Run tests (moderate stress under TSAN)
+        env:
+          STRESS_LOOPS: 200
+        run: make run
