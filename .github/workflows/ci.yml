@@ -1,12 +1,9 @@
+name: ci
 
-name: CI: C Tests
-
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  build-and-test:
+  build_and_test:
     name: gcc/clang (no sanitizer)
     runs-on: ubuntu-latest
     strategy:
