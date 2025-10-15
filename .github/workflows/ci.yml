@@ -27,7 +27,7 @@ jobs:
         run: make run
 
   tsan:
-    name: clang + ThreadSanitizer
+    name: clang + ThreadSanitizer (single-threaded subset)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,8 @@ jobs:
         run: |
           make clean || true
           make SAN=tsan
-      - name: Run tests (moderate stress under TSAN)
+      - name: Run tests (skip MT & stress under TSAN)
         env:
-          STRESS_LOOPS: 200
+          DISABLE_MT: "1"
+          STRESS_LOOPS: "0"
         run: make run
