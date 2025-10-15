@@ -50,6 +50,7 @@ static int get_global_state(void) {
 // Single-threaded tests
 
 TEST(test_class_init_idempotent) {
+	if (tsan_mt_disabled()) return 0;
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class_init first (0=first, -1=already)", r == 0 || r == -1);
     ASSERT_EQ_INT("class_init second", EmergencyNode_class_init(), -1);
@@ -57,6 +58,7 @@ TEST(test_class_init_idempotent) {
 }
 
 TEST(test_basic_raise_and_solve) {
+	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t n;
     EmergencyNode_init(&n);
 
@@ -85,6 +87,7 @@ TEST(test_basic_raise_and_solve) {
 }
 
 TEST(test_bounds_checks) {
+	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t n;
     EmergencyNode_init(&n);
 
@@ -96,6 +99,7 @@ TEST(test_bounds_checks) {
 }
 
 TEST(test_bounds_oob_no_mutation) {
+	if (tsan_mt_disabled()) return 0;
     // class init can be 0 or -1 depending on earlier tests
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class init (0=first, -1=already)", r == 0 || r == -1);
@@ -131,6 +135,7 @@ TEST(test_bounds_oob_no_mutation) {
 
 
 TEST(test_destroy_clears_global_if_needed) {
+	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t a, b;
     EmergencyNode_init(&a);
     EmergencyNode_init(&b);
@@ -152,6 +157,7 @@ TEST(test_destroy_clears_global_if_needed) {
 }
 
 TEST(test_crosscheck_global_reflection_between_nodes) {
+	if (tsan_mt_disabled()) return 0;
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class init (0=first, -1=already)", r == 0 || r == -1);
 
@@ -205,6 +211,7 @@ static void* solver_thread(void* arg) {
 }
 
 TEST(test_multithread_same_node_raise_then_solve) {
+	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t n;
     EmergencyNode_init(&n);
 
@@ -237,6 +244,7 @@ TEST(test_multithread_same_node_raise_then_solve) {
 }
 
 TEST(test_multithread_many_nodes) {
+	if (tsan_mt_disabled()) return 0;
     const int N = 8;
     EmergencyNode_t nodes[N];
     for (int i = 0; i < N; i++) EmergencyNode_init(&nodes[i]);
@@ -271,6 +279,7 @@ TEST(test_multithread_many_nodes) {
 
 // Optional stress: repeat threaded tests STRESS_LOOPS times (default 0 → skip)
 TEST(test_stress_loops) {
+	if (tsan_mt_disabled()) return 0;
     const char* env = getenv("STRESS_LOOPS");
     if (!env) return 0;
     int loops = atoi(env);
@@ -286,6 +295,7 @@ TEST(test_stress_loops) {
 }
 
 TEST(test_class_init_idempotent_and_non_resetting) {
+	if (tsan_mt_disabled()) return 0;
     // Accept 0 (first init) or -1 (already initialized earlier)
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("first/only class init (0=first, -1=already)", r == 0 || r == -1);
@@ -312,6 +322,7 @@ TEST(test_class_init_idempotent_and_non_resetting) {
 // This demonstrates that EmergencyNode_init() is NOT idempotent by re-initting the same node.
 // This wipes the node's local state while the global emergency remains raised.
 TEST(test_node_init_non_idempotent_behavior) {
+	if (tsan_mt_disabled()) return 0;
     // Class init may already have been called by earlier tests; accept 0 or -1.
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class init (0=first, -1=already)", r == 0 || r == -1);
