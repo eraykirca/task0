@@ -50,7 +50,6 @@ static int get_global_state(void) {
 // Single-threaded tests
 
 TEST(test_class_init_idempotent) {
-	if (tsan_mt_disabled()) return 0;
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class_init first (0=first, -1=already)", r == 0 || r == -1);
     ASSERT_EQ_INT("class_init second", EmergencyNode_class_init(), -1);
@@ -58,7 +57,6 @@ TEST(test_class_init_idempotent) {
 }
 
 TEST(test_basic_raise_and_solve) {
-	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t n;
     EmergencyNode_init(&n);
 
@@ -87,7 +85,6 @@ TEST(test_basic_raise_and_solve) {
 }
 
 TEST(test_bounds_checks) {
-	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t n;
     EmergencyNode_init(&n);
 
@@ -99,7 +96,6 @@ TEST(test_bounds_checks) {
 }
 
 TEST(test_bounds_oob_no_mutation) {
-	if (tsan_mt_disabled()) return 0;
     // class init can be 0 or -1 depending on earlier tests
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class init (0=first, -1=already)", r == 0 || r == -1);
@@ -135,7 +131,6 @@ TEST(test_bounds_oob_no_mutation) {
 
 
 TEST(test_destroy_clears_global_if_needed) {
-	if (tsan_mt_disabled()) return 0;
     EmergencyNode_t a, b;
     EmergencyNode_init(&a);
     EmergencyNode_init(&b);
@@ -157,7 +152,6 @@ TEST(test_destroy_clears_global_if_needed) {
 }
 
 TEST(test_crosscheck_global_reflection_between_nodes) {
-	if (tsan_mt_disabled()) return 0;
     int r = EmergencyNode_class_init();
     ASSERT_TRUE("class init (0=first, -1=already)", r == 0 || r == -1);
 
