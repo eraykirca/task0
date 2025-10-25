@@ -32,30 +32,30 @@ STRESS_LOOPS=50 make run
 ```
 Whats being tested
 
-Right behavior (golden paths)
+Right behavior (golden paths):
 Single-node raise, solve clears both node & global when the node still “owns” the bit.
 The class initializer behaves as a singleton (see below).
 
-Boundaries
+Boundaries:
 Valid/invalid exception indices (0..NUM_EMERGENCY_BUFFER*8 - 1 are valid).
 OOB returns −1 and does not mutate any state.
 
-Inverses
+Inverses:
 raise then solve works when the same node still has the bit.
 After a node is re-initialized, solve can no longer clear global (bit wiped).
 
-Cross-checks
+Cross-checks:
 Global vs node: raising on node A must be visible as “emergency” when queried via node B.
 
-Error conditions
+Error conditions:
 Re-calling the class initializer returns −1 and does not reset state.
 
-Performance
+Performance:
 Two threads raising/solving on the same node.
 Multiple threads across multiple nodes.
 Optional stress loops (via STRESS_LOOPS env).
 
-summary
+summary:
 EmergencyNode_class_init(): first call returns 0, all later calls return -1 within the same process.
 EmergencyNode_init() is not idempotent: every call zeroes the struct; re-init on a live node wipes its local state while the global emergency may remain raised.
 
