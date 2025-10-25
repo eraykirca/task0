@@ -19,19 +19,6 @@ STRESS_LOOPS=250 make run   # heavier stress on threaded tests
 - Bounds checks and destroy semantics
 - Optional stress loop via `STRESS_LOOPS`
 
-## Structure
-```
-.
-├── .github/workflows/ci.yml
-├── Makefile
-├── src
-│   ├── emergency_module.c
-│   └── emergency_module.h
-└── tests
-    ├── mini_assert.h
-    └── test_emergency_module.c
-```
-
 ## Build & Run
 ```bash
 make          # builds with -fsanitize=thread if supported
@@ -67,22 +54,6 @@ Performance
 Two threads raising/solving on the same node.
 Multiple threads across multiple nodes.
 Optional stress loops (via STRESS_LOOPS env).
-
-int8_t EmergencyNode_init(EmergencyNode_t* const restrict p_self) {
-  memset(p_self, 0, sizeof(*p_self));
-  return 0;
-}
-it wipes the entire struct every call
-so calling it twice destroys any previous node state (bits, counters)
-After init() #1  node correctly initialized.
-After init() #2  everything is zeroed again; any raised emergencies in that node are lost.
-
-In contrast, the class initializer ACTUALLY DOES check idempotency:
-if (EXCEPTION_COUNTER.init_done)
-    return -1;
-
-So if you are still reading right now, my guess is that Race Up wanted to check if I would be able to detect this idempotency trap,
-which I did :D
 
 summary
 EmergencyNode_class_init(): first call returns 0, all later calls return -1 within the same process.
